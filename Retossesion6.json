@@ -1,0 +1,38 @@
+[{$match: 
+{property_type: "House",  
+bedrooms: {$gte: 1}
+}},
+{$addFields: {costo_recamara: {$divide: 
+["$price", "$bedrooms"]}
+}},
+{$group: { _id: "$address.country", 
+recamaras: {
+$sum: 1  },
+total: {  $sum: "$costo_recamara"
+}
+}
+},
+{$addFields: {   
+costo_promedio: {
+$divide: ["$total", "$recamaras"]
+}
+}}]
+
+
+
+[{$lookup: {
+  from: 'users',
+  localField: 'email',
+  foreignField: 'email',
+  as: 'usuario'
+}}, {$addFields: {
+  usuario_o: {$arrayElemAt: ["$usuario", 0]}
+}}, {$addFields: {
+  usuario_password: "$usuario_o.password"
+}}, {$project: {
+  _id:0,
+  name:1,
+  email:1,
+  usuario_password:1
+}}]
+
